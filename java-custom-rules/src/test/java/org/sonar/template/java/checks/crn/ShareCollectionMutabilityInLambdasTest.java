@@ -7,7 +7,12 @@ public class ShareCollectionMutabilityInLambdasTest {
 
     @Test
     public void testCollectionMutabilityInLambda() {
-        JavaCheckVerifier.verify("src/test/files/ShareCollectionMutabilityInLambdas.java",
+        JavaCheckVerifier.verify(
+                "src/test/files/ShareCollectionMutabilityInLambdas_Confluence.java",
+                new ShareCollectionMutabilityInLambdasCheck());
+
+        JavaCheckVerifier.verify(
+                "src/test/files/ShareCollectionMutabilityInLambdas_Real_Code.java",
                 new ShareCollectionMutabilityInLambdasCheck());
     }
 }

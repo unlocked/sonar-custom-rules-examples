@@ -57,7 +57,7 @@ public class MyJavaRulesDefinition implements RulesDefinition {
   public void define(Context context) {
     NewRepository repository = context
       .createRepository(REPOSITORY_KEY, Java.KEY)
-      .setName("MyCompany Custom Repository");
+      .setName("Aurea CodeReview Custom Repository");
 
     List<Class> checks = RulesList.getChecks();
     new RulesDefinitionAnnotationLoader().load(repository, Iterables.toArray(checks, Class.class));

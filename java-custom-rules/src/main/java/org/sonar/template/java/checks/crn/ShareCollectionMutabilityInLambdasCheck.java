@@ -2,12 +2,9 @@ package org.sonar.template.java.checks.crn;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import org.sonar.check.Priority;
 import org.sonar.check.Rule;
-import org.sonar.java.JavaVersionAwareVisitor;
-import org.sonar.java.model.JavaTree;
 import org.sonar.plugins.java.api.IssuableSubscriptionVisitor;
-import org.sonar.plugins.java.api.JavaVersion;
-import org.sonar.plugins.java.api.semantic.Type;
 import org.sonar.plugins.java.api.tree.BlockTree;
 import org.sonar.plugins.java.api.tree.ExpressionStatementTree;
 import org.sonar.plugins.java.api.tree.ExpressionTree;
@@ -15,22 +12,22 @@ import org.sonar.plugins.java.api.tree.IdentifierTree;
 import org.sonar.plugins.java.api.tree.LambdaExpressionTree;
 import org.sonar.plugins.java.api.tree.MemberSelectExpressionTree;
 import org.sonar.plugins.java.api.tree.MethodInvocationTree;
-import org.sonar.plugins.java.api.tree.ParameterizedTypeTree;
 import org.sonar.plugins.java.api.tree.StatementTree;
 import org.sonar.plugins.java.api.tree.Tree;
-import org.sonar.plugins.java.api.tree.VariableTree;
 
-@Rule()
-public class ShareCollectionMutabilityInLambdasCheck extends IssuableSubscriptionVisitor
-        implements JavaVersionAwareVisitor {
+@Rule(
+        key = "ShareCollectionMutabilityInLambdasCheck",
+        name = "Shared Collection Mutability in Lambdas Should Be Avoided",
+        description = "This lambda refers to non-local mutable collection or map. " +
+                "Mutability is ok, sharing is nice, shared mutability is a bad practice. " +
+                "Consider exploiting Lambdas API to eliminate this side-effect as in the example.",
+        priority = Priority.BLOCKER,
+        tags = "severe"
+)
+public class ShareCollectionMutabilityInLambdasCheck extends IssuableSubscriptionVisitor {
     @Override
     public List<Tree.Kind> nodesToVisit() {
         return ImmutableList.of(Tree.Kind.LAMBDA_EXPRESSION);
-    }
-
-    @Override
-    public boolean isCompatibleWithJavaVersion(JavaVersion version) {
-        return version.isJava8Compatible();
     }
 
     @Override
@@ -42,24 +39,28 @@ public class ShareCollectionMutabilityInLambdasCheck extends IssuableSubscriptio
             for (StatementTree statement : body) {
                 if (statement.is(Tree.Kind.EXPRESSION_STATEMENT)) {
                     ExpressionStatementTree expressionTree = (ExpressionStatementTree) statement;
-                    for (Tree childTree : ((JavaTree)expressionTree).getChildren()) {
-                        if (childTree.is(Tree.Kind.METHOD_INVOCATION)) {
-                            MethodInvocationTree methodInvocationTree = (MethodInvocationTree) childTree;
-                            MemberSelectExpressionTree methodSelect = (MemberSelectExpressionTree) methodInvocationTree.methodSelect();
-                            IdentifierTree identifierTree = (IdentifierTree) methodSelect.expression();
-                            Tree declaration = identifierTree.symbol().declaration();
-                            VariableTree variable = (VariableTree) declaration;
-                            ParameterizedTypeTree type = (ParameterizedTypeTree) variable.type();
-                            IdentifierTree typeIdentifier = (IdentifierTree) type.type();
-                            typeIdentifier.symbol();
-//                            if (type.type().isSubtypeOf("java.util.Collection")
-//                                    || type.type().isSubtypeOf("java.util.Map")) {
-//                                reportIssue(identifierTree, "Collection or Map \"" + variable.simpleName()
-//                                        + "\" possibly sharing it's mutability.");
-//                            }
-                        }
+                    ExpressionTree expression = expressionTree.expression();
+                    if (expression.is(Tree.Kind.METHOD_INVOCATION)) {
+                        checkLambdaInvocation((MethodInvocationTree) expression);
                     }
+
                 }
+            }
+        } else if (lambdaBody.is(Tree.Kind.METHOD_INVOCATION)) {
+            checkLambdaInvocation((MethodInvocationTree) lambdaBody);
+        }
+    }
+
+    private void checkLambdaInvocation(MethodInvocationTree childTree) {
+        MemberSelectExpressionTree methodSelect
+                = (MemberSelectExpressionTree) childTree.methodSelect();
+        ExpressionTree expression = methodSelect.expression();
+        if (expression.is(Tree.Kind.IDENTIFIER)) {
+            IdentifierTree identifierTree = (IdentifierTree) expression;
+            if (identifierTree.symbol().type().isSubtypeOf("java.util.Collection")
+                    || identifierTree.symbol().type().isSubtypeOf("java.util.Map")) {
+                reportIssue(identifierTree, "Collection or Map \""
+                        + identifierTree.symbol().name() + "\" possibly sharing it's mutability.");
             }
         }
     }

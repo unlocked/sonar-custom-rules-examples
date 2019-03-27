@@ -30,31 +30,33 @@ import org.sonar.template.java.checks.AvoidUnmodifiableListRule;
 import org.sonar.template.java.checks.MyCustomSubscriptionRule;
 import org.sonar.template.java.checks.SecurityAnnotationMandatoryRule;
 import org.sonar.template.java.checks.SpringControllerRequestMappingEntityRule;
+import org.sonar.template.java.checks.crn.ShareCollectionMutabilityInLambdasCheck;
 
 public final class RulesList {
 
-  private RulesList() {
-  }
+    private RulesList() {
+    }
 
-  public static List<Class> getChecks() {
-    return ImmutableList.<Class>builder().addAll(getJavaChecks()).addAll(getJavaTestChecks()).build();
-  }
+    public static List<Class> getChecks() {
+        return ImmutableList.<Class>builder().addAll(getJavaChecks()).addAll(getJavaTestChecks()).build();
+    }
 
-  public static List<Class<? extends JavaCheck>> getJavaChecks() {
-    return ImmutableList.<Class<? extends JavaCheck>>builder()
-      .add(SpringControllerRequestMappingEntityRule.class)
-      .add(AvoidAnnotationRule.class)
-      .add(AvoidBrandInMethodNamesRule.class)
-      .add(AvoidMethodDeclarationRule.class)
-      .add(AvoidSuperClassRule.class)
-      .add(AvoidUnmodifiableListRule.class)
-      .add(MyCustomSubscriptionRule.class)
-      .add(SecurityAnnotationMandatoryRule.class)
-      .build();
-  }
+    public static List<Class<? extends JavaCheck>> getJavaChecks() {
+        return ImmutableList.<Class<? extends JavaCheck>>builder()
+                .add(SpringControllerRequestMappingEntityRule.class)
+                .add(AvoidAnnotationRule.class)
+                .add(AvoidBrandInMethodNamesRule.class)
+                .add(AvoidMethodDeclarationRule.class)
+                .add(AvoidSuperClassRule.class)
+                .add(AvoidUnmodifiableListRule.class)
+                .add(MyCustomSubscriptionRule.class)
+                .add(SecurityAnnotationMandatoryRule.class)
+                .add(ShareCollectionMutabilityInLambdasCheck.class)
+                .build();
+    }
 
-  public static List<Class<? extends JavaCheck>> getJavaTestChecks() {
-    return ImmutableList.<Class<? extends JavaCheck>>builder()
-      .build();
-  }
+    public static List<Class<? extends JavaCheck>> getJavaTestChecks() {
+        return ImmutableList.<Class<? extends JavaCheck>>builder()
+                .build();
+    }
 }
