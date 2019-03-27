@@ -17,30 +17,41 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.samples.java.checks;
+/*
+ * Creation : 20 avr. 2015
+ */
+package org.sonar.template.java.checks;
 
-import org.junit.Rule;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
 import org.sonar.java.checks.verifier.JavaCheckVerifier;
-import org.sonar.squidbridge.checks.CheckMessagesVerifierRule;
 
-public class SecurityAnnotationMandatoryCheckTest {
+public class AvoidSuperClassCheckTest {
 
-  @Rule
-  public CheckMessagesVerifierRule checkMessagesVerifier = new CheckMessagesVerifierRule();
+  /** JAR dependencies for classpath execution */
+  private static final List<File> CLASSPATH_JAR;
+
+  static {
+    // Jar ClassPath construction. Don't use 'ClassLoader.getSystemClassLoader()', because with Maven+Surefire/Jacoco execution, only
+    // surefirebooter.jar & jacoco.agent-version-runtime.jar are on classpath => 'old schoold way'
+    CLASSPATH_JAR = new ArrayList<>();
+    for (String jar : System.getProperty("java.class.path").split(File.pathSeparator)) {
+      if (jar.endsWith(".jar")) {
+        CLASSPATH_JAR.add(new File(jar));
+      }
+    }
+  }
 
   @Test
-  public void detected() {
-
-    // Use an instance of the check under test to raise the issue.
-    SecurityAnnotationMandatoryRule check = new SecurityAnnotationMandatoryRule();
-
-    // define the mandatory annotation name
-    check.name = "MySecurityAnnotation";
+  public void checkWithJarDependenciesInClassPath() throws Exception {
+    // As external sources are required to run the rule ('symbolType' used in custom rule, which is
+    // part of the semantic API), the test requires external dependencies in order to be run correctly.
 
     // Verifies that the check will raise the adequate issues with the expected message.
     // In the test file, lines which should raise an issue have been commented out
     // by using the following syntax: "// Noncompliant {{EXPECTED_MESSAGE}}"
-    JavaCheckVerifier.verify("src/test/files/SecurityAnnotationMandatoryCheck.java", check);
+    JavaCheckVerifier.verify("src/test/files/AvoidSuperClassCheck.java", new AvoidSuperClassRule(), CLASSPATH_JAR);
   }
 }

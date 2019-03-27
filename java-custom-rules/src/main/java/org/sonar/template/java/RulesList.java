@@ -17,19 +17,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.samples.java;
+package org.sonar.template.java;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.sonar.plugins.java.api.JavaCheck;
-import org.sonar.samples.java.checks.AvoidAnnotationRule;
-import org.sonar.samples.java.checks.AvoidBrandInMethodNamesRule;
-import org.sonar.samples.java.checks.AvoidMethodDeclarationRule;
-import org.sonar.samples.java.checks.AvoidSuperClassRule;
-import org.sonar.samples.java.checks.AvoidUnmodifiableListRule;
-import org.sonar.samples.java.checks.MyCustomSubscriptionRule;
-import org.sonar.samples.java.checks.SecurityAnnotationMandatoryRule;
-import org.sonar.samples.java.checks.SpringControllerRequestMappingEntityRule;
+import org.sonar.template.java.checks.AvoidAnnotationRule;
+import org.sonar.template.java.checks.AvoidBrandInMethodNamesRule;
+import org.sonar.template.java.checks.AvoidMethodDeclarationRule;
+import org.sonar.template.java.checks.AvoidSuperClassRule;
+import org.sonar.template.java.checks.AvoidUnmodifiableListRule;
+import org.sonar.template.java.checks.MyCustomSubscriptionRule;
+import org.sonar.template.java.checks.SecurityAnnotationMandatoryRule;
+import org.sonar.template.java.checks.SpringControllerRequestMappingEntityRule;
 
 public final class RulesList {
 

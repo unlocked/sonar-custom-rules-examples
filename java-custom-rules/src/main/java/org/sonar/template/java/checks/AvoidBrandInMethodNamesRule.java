@@ -17,28 +17,30 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.samples.java.checks;
+package org.sonar.template.java.checks;
 
 import org.sonar.check.Rule;
 import org.sonar.plugins.java.api.JavaFileScanner;
 import org.sonar.plugins.java.api.JavaFileScannerContext;
-import org.sonar.plugins.java.api.semantic.Symbol;
-import org.sonar.plugins.java.api.semantic.SymbolMetadata;
 import org.sonar.plugins.java.api.tree.BaseTreeVisitor;
 import org.sonar.plugins.java.api.tree.MethodTree;
-import org.sonar.plugins.java.api.tree.TypeTree;
-import org.sonar.plugins.java.api.tree.VariableTree;
 
-@Rule(key = "SpringControllerRequestMappingEntity")
-public class SpringControllerRequestMappingEntityRule extends BaseTreeVisitor implements JavaFileScanner {
+@Rule(key = "AvoidBrandInMethodNames")
+public class AvoidBrandInMethodNamesRule extends BaseTreeVisitor implements JavaFileScanner {
 
   private JavaFileScannerContext context;
+
+  protected static final String COMPANY_NAME = "MyCompany";
 
   @Override
   public void scanFile(JavaFileScannerContext context) {
     this.context = context;
 
+    // The call to the scan method on the root of the tree triggers the visit of the AST by this visitor
     scan(context.getTree());
+
+    // For debugging purpose, you can print out the entire AST of the analyzed file
+    System.out.println(PrinterVisitor.print(context.getTree()));
   }
 
   /**
@@ -47,23 +49,16 @@ public class SpringControllerRequestMappingEntityRule extends BaseTreeVisitor im
    */
   @Override
   public void visitMethod(MethodTree tree) {
-    Symbol.MethodSymbol methodSymbol = tree.symbol();
 
-    SymbolMetadata parentClassOwner = methodSymbol.owner().metadata();
-    boolean isControllerContext = parentClassOwner.isAnnotatedWith("org.springframework.stereotype.Controller");
-
-    if (isControllerContext
-      && methodSymbol.metadata().isAnnotatedWith("org.springframework.web.bind.annotation.RequestMapping")) {
-
-      for (VariableTree param : tree.parameters()) {
-        TypeTree typeOfParam = param.type();
-        if (typeOfParam.symbolType().symbol().metadata().isAnnotatedWith("javax.persistence.Entity")) {
-          context.reportIssue(this, typeOfParam, String.format("Don't use %s here because it's an @Entity", typeOfParam.symbolType().name()));
-        }
-      }
-
+    if (tree.simpleName().name().toUpperCase().contains(COMPANY_NAME.toUpperCase())) {
+      // Adds an issue by attaching it with the tree and the rule
+      context.reportIssue(this, tree, "Avoid using Brand in method name");
     }
+    // The call to the super implementation allows to continue the visit of the AST.
+    // Be careful to always call this method to visit every node of the tree.
     super.visitMethod(tree);
+
+    // All the code located after the call to the overridden method is executed when leaving the node
   }
 
 }

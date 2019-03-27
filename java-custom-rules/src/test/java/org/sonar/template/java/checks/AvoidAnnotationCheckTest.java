@@ -17,21 +17,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.samples.java.checks;
+package org.sonar.template.java.checks;
 
 import org.junit.Test;
 import org.sonar.java.checks.verifier.JavaCheckVerifier;
 
-public class AvoidUnmodifiableListTest {
+public class AvoidAnnotationCheckTest {
 
   @Test
-  public void verify() {
-    // In order to test this check efficiently, we added the test-jar "org.apache.commons.commons-collections4" to the pom,
-    // which is normally not used by the code of our custom plugin.
-    // All the classes from this jar will then be read when verifying the ticket, allowing correct type resolution.
+  public void detected() {
 
-    // Verifies automatically that the check will raise the adequate issues with the expected message
-    JavaCheckVerifier.verify("src/test/files/AvoidUnmodifiableList.java", new AvoidUnmodifiableListRule());
+    // Use an instance of the check under test to raise the issue.
+    AvoidAnnotationRule check = new AvoidAnnotationRule();
+
+    // define the forbidden annotation name
+    check.name = "Zuper";
+
+    // Verifies that the check will raise the adequate issues with the expected message.
+    // In the test file, lines which should raise an issue have been commented out
+    // by using the following syntax: "// Noncompliant {{EXPECTED_MESSAGE}}"
+    JavaCheckVerifier.verify("src/test/files/AvoidAnnotationCheck.java", check);
   }
-
 }

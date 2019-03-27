@@ -17,28 +17,48 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.samples.java.checks;
+/*
+ * Creation : 20 avr. 2015
+ */
+package org.sonar.template.java.checks;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.sonar.check.Rule;
 import org.sonar.plugins.java.api.IssuableSubscriptionVisitor;
-import org.sonar.plugins.java.api.tree.NewClassTree;
+import org.sonar.plugins.java.api.tree.ClassTree;
 import org.sonar.plugins.java.api.tree.Tree;
 
-@Rule(key = "AvoidUnmodifiableList")
-public class AvoidUnmodifiableListRule extends IssuableSubscriptionVisitor {
+/**
+ * Only to bring out the unit test requirement about classpath when bytecode methods used (see rule unit test class)
+ */
+@Rule(key = "AvoidSuperClass")
+public class AvoidSuperClassRule extends IssuableSubscriptionVisitor {
+
+  public static final List<String> SUPER_CLASS_AVOID = ImmutableList.of("org.slf4j.Logger");
 
   @Override
   public List<Tree.Kind> nodesToVisit() {
-    return ImmutableList.of(Tree.Kind.NEW_CLASS);
+    // Register to the kind of nodes you want to be called upon visit.
+    return ImmutableList.of(Tree.Kind.CLASS);
   }
 
   @Override
   public void visitNode(Tree tree) {
+    // Visit CLASS node only => cast could be done
+    ClassTree treeClazz = (ClassTree) tree;
 
-    if (((NewClassTree) tree).symbolType().isSubtypeOf("org.apache.commons.collections4.list.UnmodifiableList")) {
-      reportIssue(tree, "Avoid using UnmodifiableList");
+    // No extends => stop to visit class
+    if (treeClazz.superClass() == null) {
+      return;
+    }
+
+    // For 'symbolType' usage, jar in dependencies must be on classpath, !unknownSymbol! result otherwise
+    String superClassName = treeClazz.superClass().symbolType().fullyQualifiedName();
+
+    // Check if superClass avoid
+    if (SUPER_CLASS_AVOID.contains(superClassName)) {
+      reportIssue(tree, String.format("The usage of super class %s is forbidden", superClassName));
     }
   }
 

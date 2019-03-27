@@ -17,16 +17,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.samples.java.checks;
+package org.sonar.template.java.checks;
 
 import org.junit.Test;
 import org.sonar.java.checks.verifier.JavaCheckVerifier;
 
-public class SpringControllerRequestMappingEntityRuleTest {
+public class AvoidBrandInMethodNamesCheckTest {
 
   @Test
-  public void check() {
-    JavaCheckVerifier.verify("src/test/files/SpringControllerRequestMappingEntityRule.java", new SpringControllerRequestMappingEntityRule());
+  public void detected() {
+    // Verifies that the check will raise the adequate issues with the expected message.
+    // In the test file, lines which should raise an issue have been commented out
+    // by using the following syntax: "// Noncompliant {{EXPECTED_MESSAGE}}"
+    JavaCheckVerifier.verify("src/test/files/AvoidBrandInMethodNamesCheck.java", new AvoidBrandInMethodNamesRule());
   }
-
 }

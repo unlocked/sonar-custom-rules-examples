@@ -17,22 +17,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.samples.java.checks;
+package org.sonar.template.java.checks;
 
 import org.junit.Test;
 import org.sonar.java.checks.verifier.JavaCheckVerifier;
 
-/**
- * This class is the test of the ExampleCheck.
- * Checks by running it against a minimal valid file.
- */
-public class AvoidMethodDeclarationCheckTest {
+public class MyCustomSubscriptionRuleTest {
 
   @Test
-  public void detected() {
+  public void check() {
     // Verifies that the check will raise the adequate issues with the expected message.
     // In the test file, lines which should raise an issue have been commented out
     // by using the following syntax: "// Noncompliant {{EXPECTED_MESSAGE}}"
-    JavaCheckVerifier.verify("src/test/files/AvoidMethodDeclarationCheck.java", new AvoidMethodDeclarationRule());
+    JavaCheckVerifier.verify("src/test/files/MyCustomRule.java", new MyCustomSubscriptionRule());
   }
 }

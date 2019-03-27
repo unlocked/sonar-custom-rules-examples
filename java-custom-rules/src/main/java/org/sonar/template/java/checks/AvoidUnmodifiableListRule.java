@@ -17,18 +17,29 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.samples.java.checks;
+package org.sonar.template.java.checks;
 
-import org.junit.Test;
-import org.sonar.java.checks.verifier.JavaCheckVerifier;
+import com.google.common.collect.ImmutableList;
+import java.util.List;
+import org.sonar.check.Rule;
+import org.sonar.plugins.java.api.IssuableSubscriptionVisitor;
+import org.sonar.plugins.java.api.tree.NewClassTree;
+import org.sonar.plugins.java.api.tree.Tree;
 
-public class MyCustomSubscriptionRuleTest {
+@Rule(key = "AvoidUnmodifiableList")
+public class AvoidUnmodifiableListRule extends IssuableSubscriptionVisitor {
 
-  @Test
-  public void check() {
-    // Verifies that the check will raise the adequate issues with the expected message.
-    // In the test file, lines which should raise an issue have been commented out
-    // by using the following syntax: "// Noncompliant {{EXPECTED_MESSAGE}}"
-    JavaCheckVerifier.verify("src/test/files/MyCustomRule.java", new MyCustomSubscriptionRule());
+  @Override
+  public List<Tree.Kind> nodesToVisit() {
+    return ImmutableList.of(Tree.Kind.NEW_CLASS);
   }
+
+  @Override
+  public void visitNode(Tree tree) {
+
+    if (((NewClassTree) tree).symbolType().isSubtypeOf("org.apache.commons.collections4.list.UnmodifiableList")) {
+      reportIssue(tree, "Avoid using UnmodifiableList");
+    }
+  }
+
 }

@@ -17,24 +17,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.samples.java;
+package org.sonar.template.java.checks;
 
-import org.sonar.api.Plugin;
+import org.junit.Test;
+import org.sonar.java.checks.verifier.JavaCheckVerifier;
 
-/**
- * Entry point of your plugin containing your custom rules
- */
-public class MyJavaRulesPlugin implements Plugin {
+public class SpringControllerRequestMappingEntityRuleTest {
 
-  @Override
-  public void define(Context context) {
-
-    // server extensions -> objects are instantiated during server startup
-    context.addExtension(MyJavaRulesDefinition.class);
-
-    // batch extensions -> objects are instantiated during code analysis
-    context.addExtension(MyJavaFileCheckRegistrar.class);
-
+  @Test
+  public void check() {
+    JavaCheckVerifier.verify("src/test/files/SpringControllerRequestMappingEntityRule.java", new SpringControllerRequestMappingEntityRule());
   }
 
 }
